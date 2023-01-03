@@ -35,41 +35,35 @@ namespace Beckhoff_Client.DataAccess
             }
         }
 
-        public IEnumerable<Variables> GetVariables()
+        public IEnumerable<Symbol> GetVariables()
         {
-            List<Variables> variables = new List<Variables>();
+            List<Symbol> Symbols = new List<Symbol>();
             // Load all Symbols + DataTypes
             ISymbolLoader loader = SymbolLoaderFactory.Create(ads, SymbolLoaderSettings.Default);
             ISymbolCollection<ISymbol> allSymbols = loader.Symbols;
-            Symbol symbol;
             foreach (ISymbol val in allSymbols)
             {
                 if (val.Category != DataTypeCategory.Struct)
                 {
-                    Variables variable = new Variables();
-                    symbol = (Symbol)loader.Symbols["." + val.InstanceName];
-                    variable.Name = val.InstanceName;
-                    variable.Value = symbol.ReadValue().ToString();
-                    Debug.WriteLine("Name : " + variable.Name + " " + variable.Value);
-                    variables.Add(variable);
+                    Symbol symbol = (Symbol)loader.Symbols["." + val.InstanceName];
+                    Debug.WriteLine("Name : " + symbol.InstanceName + " " + symbol.ReadValue().ToString());
+                    Symbols.Add(symbol);
                 }
             }
-            return variables;
+            return Symbols;
 
         }
-        public Variables GetVariableValue(Variables variable)
+        public Symbol GetVariableValue(Symbol symbol)
         {
             ISymbolLoader loader = SymbolLoaderFactory.Create(ads, SymbolLoaderSettings.Default);
-            Symbol symbol = (Symbol)loader.Symbols["." + variable.Name];
-            variable.Value = symbol.ReadValue().ToString();
-            return variable;
+            Symbol _symbol = (Symbol)loader.Symbols[symbol.InstanceName];
+            return _symbol;
         }
-        public void SetVatiable(Variables var)
+        public void SetVariable(Symbol symbol)
         {
             ISymbolLoader loader = SymbolLoaderFactory.Create(ads, SymbolLoaderSettings.Default);
-            Symbol symbol;
-            symbol = (Symbol)loader.Symbols["." + var.Name];
-            symbol.WriteValue(var.Value);
+            Symbol _symbol = (Symbol)loader.Symbols[symbol.InstanceName];
+            _symbol.WriteValue(symbol);
         }
     }
 }

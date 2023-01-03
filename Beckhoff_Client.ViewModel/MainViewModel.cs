@@ -4,6 +4,7 @@ using Beckhoff_Client.ViewModel.Command;
 using System.Collections.ObjectModel;
 using System.Net;
 using TwinCAT.Ads;
+using TwinCAT.Ads.TypeSystem;
 
 namespace Beckhoff_Client.ViewModel
 {
@@ -23,7 +24,7 @@ namespace Beckhoff_Client.ViewModel
             LoadCommand = new DelegateCommand(Load);
         }
         public DelegateCommand LoadCommand { get; }
-        public VariablesViewModel SelectedVariable
+        public VariablesViewModel SelectedVariable /* Służy tylko do wpisywania w pole tekstowe wartości zmiennej */
         {
             get => _selectedVariable;
             set
@@ -54,14 +55,6 @@ namespace Beckhoff_Client.ViewModel
             {
                 Variables.Add(new VariablesViewModel(item, _variablesDataProvider));
             }
-        }
-        public string Save()
-        {
-            Variables variable = new Variables();
-            variable.Name = _selectedVariable.Name;
-            variable.Value = _selectedVariable.Value;
-            _variablesDataProvider.SetVatiable(variable);
-            return _variablesDataProvider.GetVariableValue(variable).ToString();
         }
     }
 }

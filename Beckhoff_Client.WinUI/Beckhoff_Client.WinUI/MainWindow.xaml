@@ -56,7 +56,10 @@
             <TextBox Grid.Row="1" Header="Variable Value" Margin="10"
                      Text="{x:Bind ViewModel.SelectedVariable.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      />
-            <Button Grid.Row="2" Content="Write" Click="{x:Bind ViewModel.Save}"/>
+            <Button Grid.Row="2" Content="Write" Margin="10 10 10 30"
+                    VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                    Command="{x:Bind ViewModel.SelectedVariable.SaveCommand, Mode=OneWay}"
+                    />
         </Grid>
     </Grid>
 </Window>

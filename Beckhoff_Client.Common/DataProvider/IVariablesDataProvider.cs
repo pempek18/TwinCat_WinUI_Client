@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
 using Beckhoff_Client.Common.Model;
+using TwinCAT.Ads.TypeSystem;
+using TwinCAT.TypeSystem;
 
 namespace Beckhoff_Client.Common.DataProvider
 {
     public interface IVariablesDataProvider
     {
         bool SetConnection(tcConnection ConnectionData);
-        IEnumerable<Variables> GetVariables();
-        Variables GetVariableValue(Variables variable);
-        void SetVatiable(Variables var);
+        IEnumerable<Symbol> GetVariables();
+        Symbol GetVariableValue(Symbol symbol);
+        void SetVariable(Symbol symbol);
     }
 }
