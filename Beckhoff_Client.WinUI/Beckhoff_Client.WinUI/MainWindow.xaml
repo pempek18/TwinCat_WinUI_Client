@@ -50,16 +50,23 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Margin="10"
+            <TextBlock Grid.Row="0" Margin="10"
+                     Text="{x:Bind ViewModel.connectionStatus}"
+                     />
+            <TextBlock Grid.Row="1" Margin="10"
                      Text="{x:Bind ViewModel.SelectedVariable.Name}"
                      />
-            <TextBox Grid.Row="1" Header="Variable Value" Margin="10"
+            <TextBox Grid.Row="2" Header="Variable Value" Margin="10"
                      Text="{x:Bind ViewModel.SelectedVariable.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      />
-            <Button Grid.Row="2" Content="Write" Margin="10 10 10 30"
+            <Button Grid.Row="3" Content="Write" Margin="10 10 10 30"
                     VerticalAlignment="Bottom" HorizontalAlignment="Left"
                     Command="{x:Bind ViewModel.SelectedVariable.SaveCommand, Mode=OneWay}"
                     />
+            <ListView Grid.Row="4"
+                      ItemsSource="{x:Bind ViewModel.SelectedVariable.Values, Mode=OneWay}"
+                      SelectedItem="{x:Bind ViewModel.SelectedVariable.SelectedValue, Mode=TwoWay}"
+                      />
         </Grid>
     </Grid>
 </Window>

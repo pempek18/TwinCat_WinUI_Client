@@ -2,6 +2,10 @@
 using Beckhoff_Client.Common.Model;
 using Beckhoff_Client.DataAccess;
 using Beckhoff_Client.ViewModel.Command;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq.Expressions;
+using System.Windows.Forms.VisualStyles;
 using TwinCAT.Ads.TypeSystem;
 using WinRT;
 
@@ -14,13 +18,14 @@ namespace Beckhoff_Client.ViewModel
     {
         private readonly Symbol _symbol;
         private readonly IVariablesDataProvider _variablesDataProvider;
-        private string ValueToWrite;
+        private string _Value = null;
+        public ObservableCollection<String> Values { get;} = new();
         public VariablesViewModel(Symbol symbol, IVariablesDataProvider variablesDataProvider)
         {
             _symbol = symbol;
-            ValueToWrite = _symbol.ReadValue().ToString();
             _variablesDataProvider = variablesDataProvider;
             SaveCommand = new DelegateCommand(Save, () => CanSave);
+            LoadCommand = new DelegateCommand(Load, () => IsValueSelected);
         }
 
         public string Name
@@ -29,12 +34,27 @@ namespace Beckhoff_Client.ViewModel
         }
         public string Value
         {
-            get => ValueToWrite;
+            get
+            {
+                if (string.IsNullOrEmpty(_Value))
+                {
+                    Load();
+                }
+                return _Value;
+            }
             set
             {
-                if (ValueToWrite != value)
+                if (_Value != value)
                 {
-                    ValueToWrite = value;
+                    if (changeValue)
+                    {
+                        value = _Value;
+                        changeValue = false;
+                    }
+                    else
+                    {
+                        _Value = value;
+                    }
                     RaisePropertyChanged();
                     RaisePropertyChanged(nameof(CanSave));
                     SaveCommand.RaiseCanExecuteChanged();
@@ -42,28 +62,166 @@ namespace Beckhoff_Client.ViewModel
             }
         }
 
+        bool changeValue;
+
+        public string SelectedValue
+        {
+            get
+            {
+                Value = _Value;
+                return _Value;
+            }
+            set
+            {
+                if (_Value != value)
+                {
+                    _Value = value;
+                    changeValue = true;
+                    Value = _Value;
+                    RaisePropertyChanged(nameof(Value));
+                    RaisePropertyChanged();
+                    RaisePropertyChanged(nameof(IsValueSelected));
+                }
+            }
+        }
+        public bool IsValueSelected => !string.IsNullOrEmpty(SelectedValue);
+
         public DelegateCommand SaveCommand { get; }
+        public DelegateCommand LoadCommand { get; }
 
         public bool CanSave
         {
             get
             {
-                bool CanSaveTemp;
-                if (_symbol.GetType().ToString() == "BOOL" )
+                try
                 {
-                    bool.TryParse(ValueToWrite, out CanSaveTemp);
-                    return CanSaveTemp;
-                } else if (_symbol.DataType.Id == ((int)TwinCAT.Ads.AdsDataTypeId.ADST_INT16) )
+                    bool.Parse(_Value);
+                    return true;
+                }
+                catch
                 {
                     return false;
                 }
-                else return false;
             }
         }
 
         public void Save()
         {
-                _symbol.WriteValue(ValueToWrite);
+            switch (_symbol.Category)
+            {
+                case TwinCAT.TypeSystem.DataTypeCategory.None:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Primitive:
+                    _symbol.WriteValue(_Value);
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Alias:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Enum:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Array:
+                    bool[] tab = new bool[_symbol.Size];
+                    for (int i = 0; i < tab.Length; i++)
+                    {
+                        bool.TryParse(Values[i],out tab[i]);
+                    }         
+                    _symbol.WriteValue(tab);
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Struct:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.FunctionBlock:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Program:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Function:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.SubRange:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.String:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Bitset:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Pointer:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Union:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Reference:
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Interface:
+                    break;
+                default:
+                    break;
+            }
+
+            Load();
+        }
+
+        public void Load()
+        {
+            Values.Clear();
+            switch (_symbol.Category)
+            {
+                case TwinCAT.TypeSystem.DataTypeCategory.None:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Primitive:
+                    if (_Value == null)
+                        _Value = _symbol.ReadValue().ToString();
+                    Values.Add(_Value);
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Alias:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Enum:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Array:
+                    if (_Value == null)
+                        _Value = _symbol.ReadValue().ToString();
+                    if (_Value == "System.Boolean[]")
+                    {
+                        bool[] tab = new bool[_symbol.Size];
+                        tab = (bool[])_symbol.ReadAnyValue(typeof(bool[]));
+                        foreach (var item in tab)
+                        {
+                            Values.Add(item.ToString());
+                        }
+                        _Value = Values[0];
+                    }
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Struct:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.FunctionBlock:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Program:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Function:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.SubRange:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.String:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Bitset:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Pointer:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Union:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Reference:
+                    _Value = null;
+                    break;
+                case TwinCAT.TypeSystem.DataTypeCategory.Interface:
+                    _Value = null;
+                    break;
+            }
         }
     }
 }

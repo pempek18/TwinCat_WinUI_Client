@@ -43,7 +43,7 @@ namespace Beckhoff_Client.DataAccess
             ISymbolCollection<ISymbol> allSymbols = loader.Symbols;
             foreach (ISymbol val in allSymbols)
             {
-                if (val.Category != DataTypeCategory.Struct)
+                if (val.Category != DataTypeCategory.Struct && val.Category != DataTypeCategory.Enum )
                 {
                     Symbol symbol = (Symbol)loader.Symbols["." + val.InstanceName];
                     Debug.WriteLine("Name : " + symbol.InstanceName + " " + symbol.ReadValue().ToString());

@@ -18,6 +18,8 @@ namespace Beckhoff_Client.ViewModel
         private VariablesViewModel _selectedVariable;
         private tcConnection tcConnection = new tcConnection();
         private readonly IVariablesDataProvider _variablesDataProvider;
+        public bool connectionStatus = false;
+        
         public MainViewModel(IVariablesDataProvider variablesDataProvider)
         {
             _variablesDataProvider = variablesDataProvider;
@@ -46,8 +48,9 @@ namespace Beckhoff_Client.ViewModel
             tcConnection._remoteIp          = IPAddress.Parse("192.168.58.129");
             tcConnection._remoteRouteName   = "VM";
             tcConnection._localNetId        = new AmsNetId("192.168.58.1.1.1");
+           
+            connectionStatus = _variablesDataProvider.SetConnection(tcConnection);
 
-            bool connectionStatus = _variablesDataProvider.SetConnection(tcConnection);
             var variables = _variablesDataProvider.GetVariables();
 
             Variables.Clear();
