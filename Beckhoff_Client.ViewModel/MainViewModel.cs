@@ -36,6 +36,7 @@ namespace Beckhoff_Client.ViewModel
                     _selectedVariable = value;
                     RaisePropertyChanged();
                     RaisePropertyChanged(nameof(IsVariableSelected));
+                    _selectedVariable.Load();
                 }
             } 
         }

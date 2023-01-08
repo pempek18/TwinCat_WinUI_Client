@@ -2,6 +2,7 @@
 using Beckhoff_Client.Common.Model;
 using Beckhoff_Client.DataAccess;
 using Beckhoff_Client.ViewModel.Command;
+using Microsoft.UI.Xaml;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
@@ -19,7 +20,11 @@ namespace Beckhoff_Client.ViewModel
         private readonly Symbol _symbol;
         private readonly IVariablesDataProvider _variablesDataProvider;
         private string _Value = null;
-        public ObservableCollection<String> Values { get;} = new();
+        private Int32 _SelectedIndex = -1;
+        public ObservableCollection<String> Values { get; } = new();
+        bool changeValue;
+        bool changeValueRadioButton;
+        private bool _radioButtonTrue;
         public VariablesViewModel(Symbol symbol, IVariablesDataProvider variablesDataProvider)
         {
             _symbol = symbol;
@@ -27,6 +32,8 @@ namespace Beckhoff_Client.ViewModel
             SaveCommand = new DelegateCommand(Save, () => CanSave);
             LoadCommand = new DelegateCommand(Load, () => IsValueSelected);
         }
+        public DelegateCommand SaveCommand { get; }
+        public DelegateCommand LoadCommand { get; }
 
         public string Name
         {
@@ -36,10 +43,6 @@ namespace Beckhoff_Client.ViewModel
         {
             get
             {
-                if (string.IsNullOrEmpty(_Value))
-                {
-                    Load();
-                }
                 return _Value;
             }
             set
@@ -61,35 +64,22 @@ namespace Beckhoff_Client.ViewModel
                 }
             }
         }
-
-        bool changeValue;
-
-        public string SelectedValue
+        public bool IsNumber
         {
             get
             {
-                Value = _Value;
-                return _Value;
-            }
-            set
-            {
-                if (_Value != value)
+                try
                 {
-                    _Value = value;
-                    changeValue = true;
-                    Value = _Value;
-                    RaisePropertyChanged(nameof(Value));
-                    RaisePropertyChanged();
-                    RaisePropertyChanged(nameof(IsValueSelected));
+                    Int32.Parse(_Value);
+                    return true;
+                }
+                catch
+                {
+                    return false;   
                 }
             }
         }
-        public bool IsValueSelected => !string.IsNullOrEmpty(SelectedValue);
-
-        public DelegateCommand SaveCommand { get; }
-        public DelegateCommand LoadCommand { get; }
-
-        public bool CanSave
+        public bool IsBoolean
         {
             get
             {
@@ -99,6 +89,122 @@ namespace Beckhoff_Client.ViewModel
                     return true;
                 }
                 catch
+                {
+                    return false;
+                }
+            }
+        }
+        public bool RadioButtonFalseChecked
+        {
+            get => !_radioButtonTrue;
+            set
+            {
+                if (changeValueRadioButton)
+                {
+                    value = !_radioButtonTrue;
+                    changeValueRadioButton = false;
+                }
+            }
+        }
+        public bool RadioButtonTrueChecked
+        {
+            get => _radioButtonTrue;
+            set
+            {
+                if (changeValueRadioButton)
+                {
+                    value = _radioButtonTrue;
+                    changeValueRadioButton = false;
+                }
+                if (_radioButtonTrue != value)
+                {
+                    _radioButtonTrue = value;
+                    _Value = value.ToString();
+                    RaisePropertyChanged();
+                    RaisePropertyChanged(nameof(CanSave));
+                    SaveCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
+        public string SelectedValue
+        {
+            get
+            {
+                Value = _Value;
+                return _Value;
+            }
+            set
+            {
+                _Value = value;
+                changeValue = true;
+                Value = _Value;
+                RaisePropertyChanged(nameof(Value));
+                RaisePropertyChanged(nameof(IsValueSelected));
+                /*Radio buttons*/
+                RaisePropertyChanged(nameof(IsBoolean));
+                if (IsBoolean)
+                {
+                    _radioButtonTrue = bool.Parse(_Value);
+                    if (_radioButtonTrue)
+                    {
+                        changeValueRadioButton = true;
+                        RadioButtonTrueChecked = true;
+                        RaisePropertyChanged(nameof(RadioButtonTrueChecked));
+                    }
+                    else
+                    {
+                        changeValueRadioButton = true;
+                        RadioButtonFalseChecked = true;
+                        RaisePropertyChanged(nameof(RadioButtonFalseChecked));
+                    }
+                }else
+                {
+                    RaisePropertyChanged(nameof(IsNumber));
+                }
+            }
+        }
+        public bool IsValueSelected => !string.IsNullOrEmpty(SelectedValue);
+
+        public Int32 SelectedIndex
+        {
+            get
+            {
+                return _SelectedIndex;
+            }
+            set
+            {
+                _SelectedIndex = value;
+            }
+        }
+
+        public bool CanSave
+        {
+            get
+            {
+                if (IsBoolean)
+                {
+                    try
+                    {
+                        bool.Parse(_Value);
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                } else if (IsNumber)
+                {
+                    try
+                    {
+                        Int32.Parse(_Value);
+                        return true;
+                    }
+                    catch
+                    {
+
+                        return false;
+                    }
+                }else
                 {
                     return false;
                 }
@@ -122,9 +228,11 @@ namespace Beckhoff_Client.ViewModel
                     bool[] tab = new bool[_symbol.Size];
                     for (int i = 0; i < tab.Length; i++)
                     {
-                        bool.TryParse(Values[i],out tab[i]);
-                    }         
+                        bool.TryParse(Values[i], out tab[i]);
+                    }
+                    bool.TryParse(_Value, out tab[_SelectedIndex]);
                     _symbol.WriteValue(tab);
+                    Values[_SelectedIndex] = _Value;
                     break;
                 case TwinCAT.TypeSystem.DataTypeCategory.Struct:
                     break;
@@ -151,7 +259,6 @@ namespace Beckhoff_Client.ViewModel
                 default:
                     break;
             }
-
             Load();
         }
 

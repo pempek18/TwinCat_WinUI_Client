@@ -42,7 +42,6 @@
         <Grid Grid.Row="1" Grid.Column="1"
               Visibility="{x:Bind ViewModel.IsVariableSelected, Mode=OneWay}" 
               >
-
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -53,20 +52,32 @@
             <TextBlock Grid.Row="0" Margin="10"
                      Text="{x:Bind ViewModel.connectionStatus}"
                      />
-            <TextBlock Grid.Row="1" Margin="10"
+            <StackPanel>
+                <TextBlock Grid.Row="1" Margin="10"
                      Text="{x:Bind ViewModel.SelectedVariable.Name}"
                      />
-            <TextBox Grid.Row="2" Header="Variable Value" Margin="10"
+                <TextBox Grid.Row="2" Header="Variable Value" Margin="10" Visibility="{x:Bind ViewModel.SelectedVariable.IsNumber, Mode=OneWay}"
                      Text="{x:Bind ViewModel.SelectedVariable.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      />
+                <RadioButton Grid.Row="2" Margin="10 10 10 10" 
+                         Visibility="{x:Bind ViewModel.SelectedVariable.IsBoolean, Mode=OneWay}"
+                         Content="False"
+                         IsChecked="{x:Bind ViewModel.SelectedVariable.RadioButtonFalseChecked, Mode=TwoWay}"/>
+                <RadioButton Grid.Row="2" Margin="10 10 10 10" 
+                         Visibility="{x:Bind ViewModel.SelectedVariable.IsBoolean, Mode=OneWay}"
+                         Content="True"
+                         IsChecked="{x:Bind ViewModel.SelectedVariable.RadioButtonTrueChecked, Mode=TwoWay}"/>
+            </StackPanel>
             <Button Grid.Row="3" Content="Write" Margin="10 10 10 30"
                     VerticalAlignment="Bottom" HorizontalAlignment="Left"
                     Command="{x:Bind ViewModel.SelectedVariable.SaveCommand, Mode=OneWay}"
                     />
-            <ListView Grid.Row="4"
+            <ListView Grid.Row="4" Margin="10"
                       ItemsSource="{x:Bind ViewModel.SelectedVariable.Values, Mode=OneWay}"
                       SelectedItem="{x:Bind ViewModel.SelectedVariable.SelectedValue, Mode=TwoWay}"
+                      SelectedIndex="{x:Bind ViewModel.SelectedVariable.SelectedIndex, Mode=TwoWay}"
                       />
+            
         </Grid>
     </Grid>
 </Window>
