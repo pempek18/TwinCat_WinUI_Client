@@ -5,6 +5,7 @@
     xmlns:local="using:Beckhoff_Client.WinUI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:Beckhoff_Client.ViewModel"
     mc:Ignorable="d">
 
     <Grid>
@@ -34,9 +35,17 @@
             <Button Content="Refresh" Click="{x:Bind ViewModel.Load}" Margin="10"/>
             <ListView Grid.Row="1"
                       ItemsSource="{x:Bind ViewModel.Variables, Mode=OneWay}"
-                      SelectedItem="{x:Bind ViewModel.SelectedVariable, Mode=TwoWay}"
-                      DisplayMemberPath="Name"
-                      />
+                      SelectedItem="{x:Bind ViewModel.SelectedVariable, Mode=TwoWay}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="model:VariablesViewModel">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontWeight="Bold"/>
+                            <TextBlock Text="{x:Bind Type, Mode=OneWay}" Margin="5 0 0 0"
+                                       Opacity="0.5"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </Grid>
         <!--Main Area-->
         <Grid Grid.Row="1" Grid.Column="1"

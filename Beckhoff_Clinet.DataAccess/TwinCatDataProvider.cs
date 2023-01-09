@@ -39,19 +39,34 @@ namespace Beckhoff_Client.DataAccess
         {
             List<Symbol> Symbols = new List<Symbol>();
             // Load all Symbols + DataTypes
-            ISymbolLoader loader = SymbolLoaderFactory.Create(ads, SymbolLoaderSettings.Default);
-            ISymbolCollection<ISymbol> allSymbols = loader.Symbols;
-            foreach (ISymbol val in allSymbols)
+            SymbolLoaderSettings settings = new SymbolLoaderSettings(SymbolsLoadMode.VirtualTree);
+            ISymbolLoader loader = SymbolLoaderFactory.Create(ads, settings);
+            ISymbol Positions = (Symbol)loader.Symbols["Positions"];
+            ISymbolCollection<ISymbol>  SubPositions = Positions.SubSymbols;
+            foreach (ISymbol sym in SubPositions)
             {
-                if (val.Category != DataTypeCategory.Struct && val.Category != DataTypeCategory.Enum )
+                if (sym.DataType.ToString() == "FB_STD_INT1" )
                 {
-                    Symbol symbol = (Symbol)loader.Symbols["." + val.InstanceName];
-                    Debug.WriteLine("Name : " + symbol.InstanceName + " " + symbol.ReadValue().ToString());
+                    Symbol symbol = (Symbol)loader.Symbols["Positions" + "." + sym.InstanceName];
+                    Debug.WriteLine("Name : " + symbol.InstanceName );
                     Symbols.Add(symbol);
                 }
             }
             return Symbols;
 
+        }
+        public string GetSubSymbolsValue(ISymbol symbol, string subSymbolName)
+        {
+            foreach (ISymbol sym in symbol.SubSymbols)
+            {
+                if (sym.InstanceName == subSymbolName)
+                {
+                    ISymbolLoader loader = SymbolLoaderFactory.Create(ads, SymbolLoaderSettings.Default);
+                    Symbol _symbol = (Symbol)loader.Symbols[sym.InstancePath];
+                    return _symbol.ReadValue().ToString();
+                }
+            }
+            return "";
         }
         public Symbol GetVariableValue(Symbol symbol)
         {

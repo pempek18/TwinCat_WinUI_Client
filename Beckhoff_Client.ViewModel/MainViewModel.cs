@@ -31,7 +31,7 @@ namespace Beckhoff_Client.ViewModel
             get => _selectedVariable;
             set
             {
-                if (_selectedVariable != value)
+                if (_selectedVariable != value && value != null)
                 {
                     _selectedVariable = value;
                     RaisePropertyChanged();

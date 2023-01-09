@@ -1,14 +1,9 @@
 ﻿using Beckhoff_Client.Common.DataProvider;
-using Beckhoff_Client.Common.Model;
-using Beckhoff_Client.DataAccess;
 using Beckhoff_Client.ViewModel.Command;
-using Microsoft.UI.Xaml;
 using System;
 using System.Collections.ObjectModel;
-using System.Linq.Expressions;
-using System.Windows.Forms.VisualStyles;
 using TwinCAT.Ads.TypeSystem;
-using WinRT;
+using TwinCAT.TypeSystem;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -22,9 +17,10 @@ namespace Beckhoff_Client.ViewModel
         private string _Value = null;
         private Int32 _SelectedIndex = -1;
         public ObservableCollection<String> Values { get; } = new();
-        bool changeValue;
+        bool changeValue = false;
         bool changeValueRadioButton;
         private bool _radioButtonTrue;
+
         public VariablesViewModel(Symbol symbol, IVariablesDataProvider variablesDataProvider)
         {
             _symbol = symbol;
@@ -39,6 +35,10 @@ namespace Beckhoff_Client.ViewModel
         {
             get => _symbol.InstanceName;
         }
+        public string Type
+        {
+            get => _symbol.TypeName.ToString();
+        }
         public string Value
         {
             get
@@ -47,17 +47,15 @@ namespace Beckhoff_Client.ViewModel
             }
             set
             {
+                if (changeValue)
+                {
+                    value = _Value;
+                    changeValue = false;
+                    RaisePropertyChanged();
+                }
                 if (_Value != value)
                 {
-                    if (changeValue)
-                    {
-                        value = _Value;
-                        changeValue = false;
-                    }
-                    else
-                    {
-                        _Value = value;
-                    }
+                    _Value = value;
                     RaisePropertyChanged();
                     RaisePropertyChanged(nameof(CanSave));
                     SaveCommand.RaiseCanExecuteChanged();
@@ -75,7 +73,7 @@ namespace Beckhoff_Client.ViewModel
                 }
                 catch
                 {
-                    return false;   
+                    return false;
                 }
             }
         }
@@ -157,7 +155,8 @@ namespace Beckhoff_Client.ViewModel
                         RadioButtonFalseChecked = true;
                         RaisePropertyChanged(nameof(RadioButtonFalseChecked));
                     }
-                }else
+                }
+                else
                 {
                     RaisePropertyChanged(nameof(IsNumber));
                 }
@@ -192,7 +191,8 @@ namespace Beckhoff_Client.ViewModel
                     {
                         return false;
                     }
-                } else if (IsNumber)
+                }
+                else if (IsNumber)
                 {
                     try
                     {
@@ -204,7 +204,8 @@ namespace Beckhoff_Client.ViewModel
 
                         return false;
                     }
-                }else
+                }
+                else
                 {
                     return false;
                 }
@@ -235,6 +236,7 @@ namespace Beckhoff_Client.ViewModel
                     Values[_SelectedIndex] = _Value;
                     break;
                 case TwinCAT.TypeSystem.DataTypeCategory.Struct:
+
                     break;
                 case TwinCAT.TypeSystem.DataTypeCategory.FunctionBlock:
                     break;
@@ -296,7 +298,8 @@ namespace Beckhoff_Client.ViewModel
                     }
                     break;
                 case TwinCAT.TypeSystem.DataTypeCategory.Struct:
-                    _Value = null;
+                    _Value = _variablesDataProvider.GetSubSymbolsValue(_symbol, "TestDrive");
+                    Values.Add(_Value);
                     break;
                 case TwinCAT.TypeSystem.DataTypeCategory.FunctionBlock:
                     _Value = null;
