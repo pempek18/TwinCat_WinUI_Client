@@ -10,6 +10,8 @@
     <UseWinUI>true</UseWinUI>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Controls\FB_STD_INT1.xaml" />
+    <None Remove="Controls\TcConnectionSetupBox.xaml" />
     <None Remove="Images\Swisslog.png" />
   </ItemGroup>
   <ItemGroup>
@@ -27,5 +29,17 @@
     <ProjectReference Include="..\..\Beckhoff_Client.Common\Beckhoff_Client.Common.csproj" />
     <ProjectReference Include="..\..\Beckhoff_Client.ViewModel\Beckhoff_Client.ViewModel.csproj" />
     <ProjectReference Include="..\..\Beckhoff_Clinet.DataAccess\Beckhoff_Client.DataAccess.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\FB_STD_INT1.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\TcConnectionSetupBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>

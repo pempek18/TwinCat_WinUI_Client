@@ -41,21 +41,28 @@ namespace Beckhoff_Client.DataAccess
             // Load all Symbols + DataTypes
             SymbolLoaderSettings settings = new SymbolLoaderSettings(SymbolsLoadMode.VirtualTree);
             ISymbolLoader loader = SymbolLoaderFactory.Create(ads, settings);
-            ISymbol Positions = (Symbol)loader.Symbols["Positions"];
-            ISymbolCollection<ISymbol>  SubPositions = Positions.SubSymbols;
-            foreach (ISymbol sym in SubPositions)
+            try
             {
-                if (sym.DataType.ToString() == "FB_STD_INT1" )
+                ISymbol Positions = (Symbol)loader.Symbols["Positions"];
+                ISymbolCollection<ISymbol> SubPositions = Positions.SubSymbols;
+                foreach (ISymbol sym in SubPositions)
                 {
-                    Symbol symbol = (Symbol)loader.Symbols["Positions" + "." + sym.InstanceName];
-                    Debug.WriteLine("Name : " + symbol.InstanceName );
-                    Symbols.Add(symbol);
+                    if (sym.DataType.ToString() == "FB_STD_INT1")
+                    {
+                        Symbol symbol = (Symbol)loader.Symbols["Positions" + "." + sym.InstanceName];
+                        Debug.WriteLine("Name : " + symbol.InstanceName);
+                        Symbols.Add(symbol);
+                    }
                 }
+            }
+            catch
+            {
+                return Symbols;
             }
             return Symbols;
 
         }
-        public string GetSubSymbolsValue(ISymbol symbol, string subSymbolName)
+        public Symbol GetSubSymbols(Symbol symbol, string subSymbolName)
         {
             foreach (ISymbol sym in symbol.SubSymbols)
             {
@@ -63,11 +70,23 @@ namespace Beckhoff_Client.DataAccess
                 {
                     ISymbolLoader loader = SymbolLoaderFactory.Create(ads, SymbolLoaderSettings.Default);
                     Symbol _symbol = (Symbol)loader.Symbols[sym.InstancePath];
-                    return _symbol.ReadValue().ToString();
+                    return _symbol;
                 }
             }
-            return "";
+            return null;
         }
+        //void SetSubSymbolsValue(ISymbol symbol, string subSymbolName)
+        //{
+        //    foreach (ISymbol sym in symbol.SubSymbols)
+        //    {
+        //        if (sym.InstanceName == subSymbolName)
+        //        {
+        //            ISymbolLoader loader = SymbolLoaderFactory.Create(ads, SymbolLoaderSettings.Default);
+        //            Symbol _symbol = (Symbol)loader.Symbols[sym.InstancePath];
+        //            return _symbol.ReadValue().ToString();
+        //        }
+        //    }
+        //}
         public Symbol GetVariableValue(Symbol symbol)
         {
             ISymbolLoader loader = SymbolLoaderFactory.Create(ads, SymbolLoaderSettings.Default);

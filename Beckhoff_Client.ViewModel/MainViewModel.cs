@@ -16,7 +16,7 @@ namespace Beckhoff_Client.ViewModel
         //public ObservableCollection<ConnectionViewModel> connections { get; } = new();
         public ObservableCollection<VariablesViewModel> Variables{ get; } = new();
         private VariablesViewModel _selectedVariable;
-        private tcConnection tcConnection = new tcConnection();
+        public tcConnection tcConnection = new tcConnection();
         private readonly IVariablesDataProvider _variablesDataProvider;
         public bool connectionStatus = false;
         
@@ -44,12 +44,7 @@ namespace Beckhoff_Client.ViewModel
         public bool IsVariableSelected => SelectedVariable != null;
         //potrzebujemy listy zmiennych a do tego potrzebujemy użyć konstruktor
         public void Load()
-        {
-            tcConnection._remoteNetId       = new AmsNetId("169.254.13.29.1.1");
-            tcConnection._remoteIp          = IPAddress.Parse("192.168.58.129");
-            tcConnection._remoteRouteName   = "VM";
-            tcConnection._localNetId        = new AmsNetId("192.168.58.1.1.1");
-           
+        {         
             connectionStatus = _variablesDataProvider.SetConnection(tcConnection);
 
             var variables = _variablesDataProvider.GetVariables();

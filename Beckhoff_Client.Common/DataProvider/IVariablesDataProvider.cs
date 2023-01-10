@@ -10,7 +10,8 @@ namespace Beckhoff_Client.Common.DataProvider
         bool SetConnection(tcConnection ConnectionData);
         IEnumerable<Symbol> GetVariables();
         Symbol GetVariableValue(Symbol symbol);
-        string GetSubSymbolsValue(ISymbol symbol, string subSymbolName);
+        Symbol GetSubSymbols(Symbol symbol, string subSymbolName);
+        //void SetSubSymbolsValue(ISymbol symbol, string subSymbolName);
         void SetVariable(Symbol symbol);
     }
 }

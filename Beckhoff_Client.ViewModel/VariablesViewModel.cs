@@ -12,7 +12,7 @@ namespace Beckhoff_Client.ViewModel
 {
     public class VariablesViewModel : ViewModelBase
     {
-        private readonly Symbol _symbol;
+        private Symbol _symbol;
         private readonly IVariablesDataProvider _variablesDataProvider;
         private string _Value = null;
         private Int32 _SelectedIndex = -1;
@@ -214,6 +214,7 @@ namespace Beckhoff_Client.ViewModel
 
         public void Save()
         {
+            
             switch (_symbol.Category)
             {
                 case TwinCAT.TypeSystem.DataTypeCategory.None:
@@ -269,19 +270,10 @@ namespace Beckhoff_Client.ViewModel
             Values.Clear();
             switch (_symbol.Category)
             {
-                case TwinCAT.TypeSystem.DataTypeCategory.None:
-                    _Value = null;
-                    break;
                 case TwinCAT.TypeSystem.DataTypeCategory.Primitive:
                     if (_Value == null)
                         _Value = _symbol.ReadValue().ToString();
                     Values.Add(_Value);
-                    break;
-                case TwinCAT.TypeSystem.DataTypeCategory.Alias:
-                    _Value = null;
-                    break;
-                case TwinCAT.TypeSystem.DataTypeCategory.Enum:
-                    _Value = null;
                     break;
                 case TwinCAT.TypeSystem.DataTypeCategory.Array:
                     if (_Value == null)
@@ -298,38 +290,8 @@ namespace Beckhoff_Client.ViewModel
                     }
                     break;
                 case TwinCAT.TypeSystem.DataTypeCategory.Struct:
-                    _Value = _variablesDataProvider.GetSubSymbolsValue(_symbol, "TestDrive");
-                    Values.Add(_Value);
-                    break;
-                case TwinCAT.TypeSystem.DataTypeCategory.FunctionBlock:
-                    _Value = null;
-                    break;
-                case TwinCAT.TypeSystem.DataTypeCategory.Program:
-                    _Value = null;
-                    break;
-                case TwinCAT.TypeSystem.DataTypeCategory.Function:
-                    _Value = null;
-                    break;
-                case TwinCAT.TypeSystem.DataTypeCategory.SubRange:
-                    _Value = null;
-                    break;
-                case TwinCAT.TypeSystem.DataTypeCategory.String:
-                    _Value = null;
-                    break;
-                case TwinCAT.TypeSystem.DataTypeCategory.Bitset:
-                    _Value = null;
-                    break;
-                case TwinCAT.TypeSystem.DataTypeCategory.Pointer:
-                    _Value = null;
-                    break;
-                case TwinCAT.TypeSystem.DataTypeCategory.Union:
-                    _Value = null;
-                    break;
-                case TwinCAT.TypeSystem.DataTypeCategory.Reference:
-                    _Value = null;
-                    break;
-                case TwinCAT.TypeSystem.DataTypeCategory.Interface:
-                    _Value = null;
+                    _symbol = _variablesDataProvider.GetSubSymbols(_symbol, "TestDrive");
+                    Load();
                     break;
             }
         }
