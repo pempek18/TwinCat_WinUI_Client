@@ -7,9 +7,29 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel Orientation="Horizontal" Background="Red" Width="100" Height="100" BorderThickness="1" BorderBrush="White">
+    <StackPanel Orientation="Horizontal" Background="Gray" Width="100" Height="100" 
+                BorderThickness="2" BorderBrush="White"
+                x:Name="Layout">
         <Canvas>
-            <Rectangle Width="100" Height="10" Fill="Green"/>
+            <Grid Height="{x:Bind Layout.Height}" Width="{x:Bind Layout.Width}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Rectangle Grid.Row="0" x:Name="RecSens_0"/>
+                <Rectangle Grid.Row="1" x:Name="RecSens_1"/>
+                <TextBlock Grid.Row="2" Text="{x:Bind Name}" TextAlignment="Center" 
+                           VerticalAlignment="Center" FontWeight="Bold"
+                           Foreground="Black"/>
+                <Rectangle Grid.Row="3" x:Name="RecSens_2"/>
+                <Rectangle Grid.Row="4" x:Name="RecSens_3"/>
+                <Button Content="Drive" Click="BtnTestDrive_Clicked"
+                        x:Name="BtnTestDrive"/>
+            </Grid>
         </Canvas>
     </StackPanel>
 </UserControl>

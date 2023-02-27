@@ -37,6 +37,7 @@
             <Button Content="Refresh" Click="{x:Bind ViewModel.Load}" Margin="10"/>
             <controls:TcConnectionSetupBox Grid.Row="1" 
                                            tcConn="{x:Bind ViewModel.tcConnection}"/>
+            <controls:FB_STD_INT1 Grid.Row="5" Margin="10"/>
         </Grid>
         <Grid Grid.Row="1" Grid.Column="1">
             <ListView
@@ -93,8 +94,6 @@
                       SelectedItem="{x:Bind ViewModel.SelectedVariable.SelectedValue, Mode=TwoWay}"
                       SelectedIndex="{x:Bind ViewModel.SelectedVariable.SelectedIndex, Mode=TwoWay}"
                       />
-            <controls:FB_STD_INT1 Grid.Row="5" Margin="10"/>
-
         </Grid>
     </Grid>
 </Window>

@@ -24,5 +24,21 @@ namespace Beckhoff_Client.WinUI.Controls
         {
             this.InitializeComponent();
         }
+
+        public bool Sensor_0 { get; set; }
+        public bool Sensor_1 { get; set; }
+        public bool Sensor_2 { get; set; }
+        public bool Sensor_3 { get; set; }
+        public bool TestDrive { get; set; }
+        public string FunName { get; set; }
+
+        private void BtnTestDrive_Clicked(object sender, RoutedEventArgs e)
+        {
+            if (TestDrive)
+            { 
+                TestDrive = false;
+                BtnTestDrive.Background = 
+            }
+        }
     }
 }
